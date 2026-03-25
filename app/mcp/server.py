@@ -10,10 +10,17 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
-from tools.analyze import analyze_resume
-from tools.extract import extract_text_from_pdf
-from tools.score import score_resume_against_jd
-from tools.summarize import summarize_document
+try:
+    from app.mcp.tools.analyze import analyze_resume
+    from app.mcp.tools.extract import extract_text_from_pdf
+    from app.mcp.tools.score import score_resume_against_jd
+    from app.mcp.tools.summarize import summarize_document
+except ModuleNotFoundError:
+    # Supports running this file directly from the app/mcp directory.
+    from tools.analyze import analyze_resume
+    from tools.extract import extract_text_from_pdf
+    from tools.score import score_resume_against_jd
+    from tools.summarize import summarize_document
 
 app = Server("resume-analyzer")
 

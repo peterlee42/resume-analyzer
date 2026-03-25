@@ -41,20 +41,24 @@ Built with **MCP** · **FastAPI** · **Next.js** · **PostgreSQL** · **Docker**
 
 ## MCP Tools
 
-| Tool | Input | Output |
-|------|-------|--------|
-| `extract_pdf_text` | PDF path | Raw text, page-by-page |
-| `analyze_resume` | PDF path | Structured JSON (name, education, experience, skills, projects) |
-| `score_resume` | PDF path + job description | Score 0–100, matched/missing keywords, strengths, gaps, recommendation |
-| `summarize_document` | PDF path + optional focus | Key points, entities, summary |
+| Tool                 | Input                      | Output                                                                 |
+| -------------------- | -------------------------- | ---------------------------------------------------------------------- |
+| `extract_pdf_text`   | PDF path                   | Raw text, page-by-page                                                 |
+| `analyze_resume`     | PDF path                   | Structured JSON (name, education, experience, skills, projects)        |
+| `score_resume`       | PDF path + job description | Score 0–100, matched/missing keywords, strengths, gaps, recommendation |
+| `summarize_document` | PDF path + optional focus  | Key points, entities, summary                                          |
 
 ### Example: `score_resume` output
+
 ```json
 {
   "score": 82,
   "matched_keywords": ["Python", "PostgreSQL", "Docker", "REST APIs"],
   "missing_keywords": ["Azure", "MCP servers"],
-  "strengths": ["Strong Python and backend experience", "Proven PostgreSQL usage in production"],
+  "strengths": [
+    "Strong Python and backend experience",
+    "Proven PostgreSQL usage in production"
+  ],
   "gaps": ["No Azure experience listed", "MCP not mentioned"],
   "summary": "Strong technical fit with relevant backend and AI experience. Minor gaps in cloud platform preference and MCP familiarity.",
   "recommendation": "good fit"
@@ -66,22 +70,26 @@ Built with **MCP** · **FastAPI** · **Next.js** · **PostgreSQL** · **Docker**
 ## Getting Started
 
 ### Prerequisites
+
 - [Docker](https://www.docker.com/) and Docker Compose
 - An [Anthropic API key](https://console.anthropic.com)
 
 ### 1. Clone the repo
+
 ```bash
 git clone https://github.com/yourusername/resume-analyzer.git
 cd resume-analyzer
 ```
 
 ### 2. Set environment variables
+
 ```bash
 cp .env.example .env
 # Add your ANTHROPIC_API_KEY to .env
 ```
 
 ### 3. Run the full stack
+
 ```bash
 docker compose up --build
 ```
@@ -104,7 +112,7 @@ To use the MCP tools directly in Claude Desktop, add the following to your confi
   "mcpServers": {
     "resume-analyzer": {
       "command": "python",
-      "args": ["/absolute/path/to/resume-analyzer/mcp/server.py"],
+      "args": ["/absolute/path/to/resume-analyzer/app/mcp/server.py"],
       "env": {
         "ANTHROPIC_API_KEY": "your-api-key-here"
       }
@@ -121,7 +129,7 @@ Restart Claude Desktop and the tools will appear automatically.
 
 ```bash
 pip install pytest pytest-asyncio
-pytest tests/ -v
+pytest app/mcp/tests -v
 ```
 
 Tests use mocked Claude API responses — no API key required.
@@ -130,42 +138,42 @@ Tests use mocked Claude API responses — no API key required.
 
 ## Project Structure
 
-```
+```text
 resume-analyzer/
 ├── docker-compose.yml
-├── .env.example
-├── mcp/
-│   ├── server.py                   # MCP server entry point
-│   └── tools/
-│       ├── extract.py              # PDF text extraction (pdfplumber)
-│       ├── analyze.py              # Resume parser → structured JSON
-│       ├── score.py                # Resume scorer vs job description
-│       └── summarize.py            # General document summarizer
+├── Dockerfile.api
+├── main.py                         # root FastAPI compatibility entrypoint
 ├── api/
-│   ├── main.py                     # FastAPI app
-│   ├── routes/                     # Upload, analyze, score endpoints
-│   ├── db.py                       # PostgreSQL connection (asyncpg)
-│   └── models.py                   # DB schema
-├── frontend/                       # Next.js app
-│   ├── app/
-│   └── components/
-└── tests/
-    └── test_tools.py               # Unit tests with mocked Anthropic API
+│   └── main.py                     # legacy compatibility import path
+└── app/
+    ├── api/
+    │   ├── main.py                 # FastAPI app implementation
+    │   ├── db.py                   # PostgreSQL connection (asyncpg)
+    │   └── routes/
+    └── mcp/
+        ├── server.py               # MCP server entry point
+        ├── tools/
+        │   ├── extract.py          # PDF text extraction (pdfplumber)
+        │   ├── analyze.py          # Resume parser -> structured JSON
+        │   ├── score.py            # Resume scorer vs job description
+        │   └── summarize.py        # General document summarizer
+        └── tests/
+            └── test_tools.py       # Unit tests with mocked Anthropic API
 ```
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| AI tooling | [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk), [Anthropic Claude API](https://docs.anthropic.com) |
-| Backend | [FastAPI](https://fastapi.tiangolo.com), [asyncpg](https://github.com/MagicStack/asyncpg) |
-| Frontend | [Next.js](https://nextjs.org), [Tailwind CSS](https://tailwindcss.com) |
-| Database | [PostgreSQL](https://www.postgresql.org) |
-| PDF parsing | [pdfplumber](https://github.com/jsvine/pdfplumber) |
-| Infra | [Docker](https://www.docker.com), Docker Compose |
-| Testing | [pytest](https://pytest.org), [pytest-asyncio](https://github.com/pytest-dev/pytest-asyncio) |
+| Layer       | Technology                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------ |
+| AI tooling  | [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk), [Anthropic Claude API](https://docs.anthropic.com) |
+| Backend     | [FastAPI](https://fastapi.tiangolo.com), [asyncpg](https://github.com/MagicStack/asyncpg)                                |
+| Frontend    | [Next.js](https://nextjs.org), [Tailwind CSS](https://tailwindcss.com)                                                   |
+| Database    | [PostgreSQL](https://www.postgresql.org)                                                                                 |
+| PDF parsing | [pdfplumber](https://github.com/jsvine/pdfplumber)                                                                       |
+| Infra       | [Docker](https://www.docker.com), Docker Compose                                                                         |
+| Testing     | [pytest](https://pytest.org), [pytest-asyncio](https://github.com/pytest-dev/pytest-asyncio)                             |
 
 ---
 

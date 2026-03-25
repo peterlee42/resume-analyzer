@@ -4,12 +4,21 @@ Sends extracted resume text to Claude and returns structured JSON.
 """
 
 import json
+import os
 
 from anthropic import Anthropic
+from dotenv import load_dotenv
 
-from tools.extract import extract_text_from_pdf
+from app.mcp.tools.extract import extract_text_from_pdf
 
-client = Anthropic()
+load_dotenv()
+api_key = os.getenv("ANTHROPIC_API_KEY")
+if not api_key:
+    raise ValueError(
+        "ANTHROPIC_API_KEY environment variable is not set. "
+        "Please create a .env file with ANTHROPIC_API_KEY=your-api-key"
+    )
+client = Anthropic(api_key=api_key)
 
 
 async def analyze_resume(file_path: str) -> dict:

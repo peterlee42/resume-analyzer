@@ -7,9 +7,18 @@ import json
 
 from anthropic import Anthropic
 
-from tools.extract import extract_text_from_pdf
+from app.mcp.tools.extract import extract_text_from_pdf
+from dotenv import load_dotenv
+import os
 
-client = Anthropic()
+load_dotenv()
+api_key = os.getenv("ANTHROPIC_API_KEY")
+if not api_key:
+    raise ValueError(
+        "ANTHROPIC_API_KEY environment variable is not set. "
+        "Please create a .env file with ANTHROPIC_API_KEY=your-api-key"
+    )
+client = Anthropic(api_key=api_key)
 
 
 async def score_resume_against_jd(file_path: str, job_description: str) -> dict:
